@@ -1,4 +1,4 @@
-/* Copyright (c) 2020 The Brave Authors. All rights reserved.
+/* Copyright (c) 2021 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
@@ -21,9 +21,9 @@
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/default_handlers.h"
 
-class BraveSiteHacksNetworkDelegateBrowserTest : public InProcessBrowserTest {
+class DebounceBrowserTest : public InProcessBrowserTest {
  public:
-  BraveSiteHacksNetworkDelegateBrowserTest()
+  DebounceBrowserTest()
       : https_server_(net::EmbeddedTestServer::TYPE_HTTPS) {}
 
   void SetUpOnMainThread() override {
@@ -123,7 +123,7 @@ class BraveSiteHacksNetworkDelegateBrowserTest : public InProcessBrowserTest {
   net::test_server::EmbeddedTestServer https_server_;
 };
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterCrossSite) {
   const std::string inputs[] = {
       "", "foo=bar", "fbclid=1", "fbclid=2&key=value", "key=value&fbclid=3",
@@ -149,7 +149,7 @@ IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterShieldsDown) {
   const std::string inputs[] = {
       "", "foo=bar", "fbclid=1", "fbclid=2&key=value", "key=value&fbclid=3",
@@ -164,7 +164,7 @@ IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterSameSite) {
   const std::string inputs[] = {
       "fbclid=1",
@@ -182,7 +182,7 @@ IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterCrossSiteRedirect) {
   const std::string inputs[] = {
       "",
@@ -209,7 +209,7 @@ IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterSameSiteRedirect) {
   const std::string inputs[] = {
       "",
@@ -228,7 +228,7 @@ IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_F(BraveSiteHacksNetworkDelegateBrowserTest,
+IN_PROC_BROWSER_TEST_F(DebounceBrowserTest,
                        QueryStringFilterDirectNavigation) {
   const std::string inputs[] = {
       "",
