@@ -42,15 +42,16 @@ class PromotedContentAd : public PromotedContentAdObserver {
 
   void NotifyPromotedContentAdEvent(
       const PromotedContentAdInfo& ad,
-      const PromotedContentAdEventType event_type);
+      const PromotedContentAdEventType event_type) const;
 
-  void NotifyPromotedContentAdViewed(const PromotedContentAdInfo& ad);
-  void NotifyPromotedContentAdClicked(const PromotedContentAdInfo& ad);
+  void NotifyPromotedContentAdServed(const PromotedContentAdInfo& ad) const;
+  void NotifyPromotedContentAdViewed(const PromotedContentAdInfo& ad) const;
+  void NotifyPromotedContentAdClicked(const PromotedContentAdInfo& ad) const;
 
   void NotifyPromotedContentAdEventFailed(
       const std::string& uuid,
       const std::string& creative_instance_id,
-      const PromotedContentAdEventType event_type);
+      const PromotedContentAdEventType event_type) const;
 };
 
 }  // namespace ads

@@ -42,8 +42,7 @@ AntiTargetingFrequencyCap::~AntiTargetingFrequencyCap() = default;
 bool AntiTargetingFrequencyCap::ShouldExclude(const CreativeAdInfo& ad) {
   if (!DoesRespectCap(ad)) {
     last_message_ = base::StringPrintf(
-        "creativeSetId %s excluded as user has "
-        "previously visited an anti-targeting site",
+        "creativeSetId %s excluded as user has previously visited an anti-targeting site",
         ad.creative_set_id.c_str());
 
     return true;

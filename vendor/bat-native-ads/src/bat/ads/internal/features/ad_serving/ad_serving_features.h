@@ -15,12 +15,24 @@ extern const base::Feature kAdServing;
 
 bool IsAdServingEnabled();
 
+// TODO(tmancey): Decouple to ad_notification_serving.cc
 int GetDefaultAdNotificationsPerHour();
 int GetMaximumAdNotificationsPerDay();
+
+// TODO(tmancey): Decouple to inline_content_ad_serving.cc
+int GetMaximumInlineContentAdsPerHour();
+int GetMaximumInlineContentAdsPerDay();
+
+// TODO(tmancey): Decouple to new_tab_page_ad_serving.cc
 int GetMaximumNewTabPageAdsPerHour();
 int GetMaximumNewTabPageAdsPerDay();
+
+// TODO(tmancey): Decouple to inline_content_ad_serving.cc
 int GetMaximumPromotedContentAdsPerHour();
 int GetMaximumPromotedContentAdsPerDay();
+
+int GetBrowsingHistoryMaxCount();
+int GetBrowsingHistoryDaysAgo();
 
 }  // namespace features
 }  // namespace ads
