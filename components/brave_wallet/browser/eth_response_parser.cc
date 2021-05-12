@@ -9,6 +9,7 @@
 
 #include "base/json/json_reader.h"
 #include "base/logging.h"
+#include "brave/components/brave_wallet/browser/brave_wallet_utils.h"
 
 namespace {
 
@@ -37,6 +38,107 @@ namespace brave_wallet {
 
 bool ParseEthGetBalance(const std::string& json, std::string* hex_balance) {
   return ParseSingleStringResult(json, hex_balance);
+}
+
+bool ParseEthGetTransactionCount(const std::string& json, uint256_t* count) {
+  std::string count_str;
+  if (!ParseSingleStringResult(json, &count_str))
+    return false;
+
+  if (!HexValueToUint256(count_str, count))
+    return false;
+
+  return true;
+}
+
+bool ParseEthGetTransactionReceipt(const std::string& json,
+                                   TransactionReceipt* receipt) {
+  DCHECK(receipt);
+  base::JSONReader::ValueWithError value_with_error =
+      base::JSONReader::ReadAndReturnValueWithError(
+          json, base::JSONParserOptions::JSON_PARSE_RFC);
+  base::Optional<base::Value>& records_v = value_with_error.value;
+  if (!records_v) {
+    LOG(ERROR) << "Invalid response, could not parse JSON, JSON is: " << json;
+    return false;
+  }
+
+  const base::DictionaryValue* response_dict;
+  if (!records_v->GetAsDictionary(&response_dict)) {
+    return false;
+  }
+
+  const base::Value* result_v = response_dict->FindPath("result");
+  if (!result_v)
+    return false;
+
+  const base::DictionaryValue* result = nullptr;
+  if (!result_v->GetAsDictionary(&result))
+    return false;
+  DCHECK(result);
+
+  const std::string* transaction_hash =
+      result->FindStringPath("transactionHash");
+  DCHECK(transaction_hash);
+  receipt->transaction_hash = *transaction_hash;
+
+  if (!result->GetString("transactionHash", &receipt->transaction_hash))
+    return false;
+  std::string transaction_index;
+  if (!result->GetString("transactionIndex", &transaction_index))
+    return false;
+  if (!HexValueToUint256(transaction_index, &receipt->transaction_index))
+    return false;
+
+  std::string block_number;
+  if (!result->GetString("blockNumber", &block_number))
+    return false;
+  if (!HexValueToUint256(block_number, &receipt->block_number))
+    return false;
+
+  if (!result->GetString("blockHash", &receipt->block_hash))
+    return false;
+
+  std::string cumulative_gas_used;
+  if (!result->GetString("cumulativeGasUsed", &cumulative_gas_used))
+    return false;
+  if (!HexValueToUint256(cumulative_gas_used, &receipt->cumulative_gas_used))
+    return false;
+
+  std::string gas_used;
+  if (!result->GetString("gasUsed", &gas_used))
+    return false;
+  if (!HexValueToUint256(gas_used, &receipt->gas_used))
+    return false;
+
+  if (!result->GetString("contractAddress", &receipt->contract_address))
+    return false;
+
+    // TODO(darkdh): logs
+#if 0
+  const base::ListValue* logs = nullptr;
+  if (!result->GetList("logs", &logs))
+    return false;
+  for (const std::string& entry : logs->GetList())
+    receipt->logs.push_back(entry);
+#endif
+
+  if (!result->GetString("logsBloom", &receipt->logs_bloom))
+    return false;
+
+  std::string status;
+  if (!result->GetString("status", &status))
+    return false;
+  if (status == "0x01")
+    receipt->status = true;
+  else if (status == "0x00")
+    receipt->status = false;
+
+  return true;
+}
+
+bool ParseEthSendRawTransaction(const std::string& json, std::string* tx_hash) {
+  return ParseSingleStringResult(json, tx_hash);
 }
 
 bool ParseEthCall(const std::string& json, std::string* result) {
