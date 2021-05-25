@@ -89,6 +89,8 @@
 #include "brave/components/brave_ads/browser/component_updater/resource_component.h"
 #endif
 
+#include "brave/components/brave_federated_learning/trace_collection_service.h"
+
 using brave_component_updater::BraveComponent;
 using ntp_background_images::features::kBraveNTPBrandedWallpaper;
 using ntp_background_images::NTPBackgroundImagesService;
@@ -178,6 +180,8 @@ ProfileManager* BraveBrowserProcessImpl::profile_manager() {
 
 void BraveBrowserProcessImpl::StartBraveServices() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+
+  trace_collection_service();
 
   ad_block_service()->Start();
   https_everywhere_service()->Start();
@@ -309,6 +313,15 @@ void BraveBrowserProcessImpl::OnTorEnabledChanged() {
   }
 }
 #endif
+
+brave::BraveTraceCollectionService* BraveBrowserProcessImpl::trace_collection_service() {
+  if (trace_collection_service_) {
+    return trace_collection_service_.get();
+  }
+  trace_collection_service_ = std::make_unique<brave::BraveTraceCollectionService>(
+      local_state());
+  return trace_collection_service_.get();
+}
 
 brave::BraveP3AService* BraveBrowserProcessImpl::brave_p3a_service() {
   if (brave_p3a_service_) {
