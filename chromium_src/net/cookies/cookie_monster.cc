@@ -101,7 +101,12 @@ void CookieMonster::SetCanonicalCookieAsync(
     SetCookiesCallback callback) {
   if (options.should_use_ephemeral_storage()) {
     if (!options.top_frame_origin()) {
+      // Shouldn't happen, but don't do anything in this case.
       NOTREACHED();
+      MaybeRunCookieCallback(
+          std::move(callback),
+          CookieAccessResult(CookieInclusionStatus(
+              CookieInclusionStatus::EXCLUDE_UNKNOWN_ERROR)));
       return;
     }
     ChromiumCookieMonster* ephemeral_monster =
@@ -121,7 +126,10 @@ void CookieMonster::GetCookieListWithOptionsAsync(
     GetCookieListCallback callback) {
   if (options.should_use_ephemeral_storage()) {
     if (!options.top_frame_origin()) {
+      // Shouldn't happen, but don't do anything in this case.
       NOTREACHED();
+      MaybeRunCookieCallback(std::move(callback), CookieAccessResultList(),
+                             CookieAccessResultList());
       return;
     }
     ChromiumCookieMonster* ephemeral_monster =
