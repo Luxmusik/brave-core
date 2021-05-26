@@ -10,7 +10,6 @@ import {
   ModalActivity,
   ModalBackupRestore,
   ModalPending,
-  ModalVerify,
   WalletEmpty,
   WalletSummary,
   WalletWrapper
@@ -25,7 +24,7 @@ import * as rewardsActions from '../actions/rewards_actions'
 import * as utils from '../utils'
 import { ExtendedActivityRow, SummaryItem, SummaryType } from '../../ui/components/modalActivity'
 import { DetailRow as TransactionRow } from '../../ui/components/tableTransactions'
-import { upholdMinimumBalance } from '../../shared/lib/uphold'
+import { ConnectWalletModal } from './connect_wallet_modal'
 
 interface State {
   activeTabId: number
@@ -320,15 +319,9 @@ class PageWallet extends React.Component<Props, State> {
   }
 
   handleExternalWalletLink = () => {
-    const { ui, externalWallet, balance } = this.props.rewardsData
+    const { ui, externalWallet } = this.props.rewardsData
 
     if (!externalWallet) {
-      return
-    }
-
-    if (balance.total < upholdMinimumBalance &&
-        externalWallet.type === 'uphold') {
-      window.open(externalWallet.loginUrl, '_self')
       return
     }
 
@@ -768,19 +761,6 @@ class PageWallet extends React.Component<Props, State> {
     return ''
   }
 
-  showLoginMessage = () => {
-    const { balance, externalWallet } = this.props.rewardsData
-    const walletStatus = this.getWalletStatus()
-    const walletType = externalWallet ? externalWallet.type : ''
-
-    return (
-      (!walletStatus || walletStatus === 'unverified') &&
-      walletType === 'uphold' &&
-      balance &&
-      balance.total < upholdMinimumBalance
-    )
-  }
-
   render () {
     const {
       balance,
@@ -821,7 +801,6 @@ class PageWallet extends React.Component<Props, State> {
           goToExternalWallet={this.goToExternalWallet}
           greetings={this.getGreetings()}
           onlyAnonWallet={onlyAnonWallet}
-          showLoginMessage={this.showLoginMessage()}
         >
           {
             emptyWallet && pendingTotal === 0
@@ -868,12 +847,13 @@ class PageWallet extends React.Component<Props, State> {
         }
         {
           !onlyAnonWallet && this.state.modalVerify
-            ? <ModalVerify
-              onVerifyClick={this.onVerifyClick.bind(this, true)}
-              onClose={this.toggleVerifyModal}
-              walletType={walletType}
-              walletProvider={walletProvider}
-            />
+            ? <ConnectWalletModal
+                rewardsBalance={balance.total}
+                defaultProvider={walletType || ''}
+                providers={[{ type: walletType || '', name: walletProvider }]}
+                onContinue={this.onVerifyClick.bind(this, true)}
+                onClose={this.toggleVerifyModal}
+              />
             : null
         }
         {

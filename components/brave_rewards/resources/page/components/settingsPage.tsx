@@ -28,7 +28,6 @@ import * as rewardsActions from '../actions/rewards_actions'
 import Promotion from './promotion'
 import { getLocale } from '../../../../common/locale'
 import { getActivePromos, getPromo, PromoType, Promo } from '../promos'
-import { upholdMinimumBalance } from '../../shared/lib/uphold'
 
 interface Props extends Rewards.ComponentProps {
 }
@@ -256,7 +255,8 @@ class SettingsPage extends React.Component<Props, State> {
         <ModalRedirect
           id={'redirect-modal-bat-limit'}
           titleText={getLocale('redirectModalBatLimitTitle')}
-          errorText={text.replace('$1', String(upholdMinimumBalance))}
+          // TODO(zenparsing): Value should come from ConnectWalletModal?
+          errorText={text.replace('$1', '15')}
           buttonText={getLocale('redirectModalClose')}
           walletType={walletType}
           onClick={this.actions.hideRedirectModal}
