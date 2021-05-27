@@ -149,7 +149,7 @@ class SettingsPage extends React.Component<Props, State> {
   }
 
   getPromotionsClaims = () => {
-    const { promotions, ui } = this.props.rewardsData
+    const { promotions } = this.props.rewardsData
 
     if (!promotions) {
       return null
@@ -164,7 +164,7 @@ class SettingsPage extends React.Component<Props, State> {
 
           return (
             <div key={`promotion-${index}`}>
-              <Promotion promotion={promotion} onlyAnonWallet={ui.onlyAnonWallet} />
+              <Promotion promotion={promotion} />
             </div>
           )
         })}
@@ -178,7 +178,6 @@ class SettingsPage extends React.Component<Props, State> {
 
   render () {
     const { parameters, balance } = this.props.rewardsData
-    const { onlyAnonWallet } = this.props.rewardsData.ui
     const { total } = balance
     const convertedBalance = utils.convertBalance((total || 0), parameters.rate)
 
@@ -190,7 +189,6 @@ class SettingsPage extends React.Component<Props, State> {
           onClick={this.onToggleWallet}
           balance={total.toFixed(3).toString()}
           id={'mobile-wallet'}
-          onlyAnonWallet={onlyAnonWallet}
           converted={`${convertedBalance} USD`}
         />
         <AdsBox />

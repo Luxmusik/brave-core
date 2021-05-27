@@ -150,10 +150,6 @@ window.cr.define('brave_rewards', function () {
     }
   }
 
-  function onlyAnonWallet (only: boolean) {
-    getActions().onOnlyAnonWallet(only)
-  }
-
   function unblindedTokensReady () {
     getActions().getBalance()
   }
@@ -186,7 +182,6 @@ window.cr.define('brave_rewards', function () {
     excludedSiteChanged,
     balance,
     reconcileComplete,
-    onlyAnonWallet,
     unblindedTokensReady,
     initialized
   }
