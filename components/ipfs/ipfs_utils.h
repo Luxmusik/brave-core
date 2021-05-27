@@ -63,7 +63,7 @@ bool IsValidNodeFilename(const std::string& filename);
 bool ParsePeerConnectionString(const std::string& value,
                                std::string* id,
                                std::string* address);
-
+std::string ContentHashToIpfs(const std::string& contenthash);
 }  // namespace ipfs
 
 #endif  // BRAVE_COMPONENTS_IPFS_IPFS_UTILS_H_

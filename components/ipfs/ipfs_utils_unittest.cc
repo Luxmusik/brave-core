@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 
+
+#include "base/strings/string_number_conversions.h"
 #include "brave/components/ipfs/ipfs_constants.h"
 #include "brave/components/ipfs/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -613,4 +615,13 @@ TEST_F(IpfsUtilsUnitTest, ValidateNodeFilename) {
   ASSERT_FALSE(ipfs::IsValidNodeFilename(""));
   ASSERT_FALSE(ipfs::IsValidNodeFilename("ipfs.exe"));
   ASSERT_FALSE(ipfs::IsValidNodeFilename("go-ipfs_v0.9.0_linux"));
+}
+
+TEST_F(IpfsUtilsUnitTest, ContentHashToIpfsTest) {
+  std::string contenthash = "e30101701220f073be187e8e06039796c432a"
+                            "5bdd6da3f403c2f93fa5d9dbdc5547c7fe0e3bc";
+  std::string hex;
+  base::HexStringToString(contenthash, &hex);
+  EXPECT_EQ(ipfs::ContentHashToIpfs(hex),
+    "bafybeihqoo7bq7uoaybzpfwegks33vw2h5adyl4t7joz3pofkr6h7yhdxq");
 }

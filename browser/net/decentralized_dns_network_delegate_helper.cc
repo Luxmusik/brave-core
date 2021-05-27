@@ -55,7 +55,46 @@ int OnBeforeURLRequest_DecentralizedDnsPreRedirectWork(
     return net::ERR_IO_PENDING;
   }
 
+  if (IsENSTLD(ctx->request_url) &&
+      IsENSResolveMethodEthereum(
+          g_browser_process->local_state())) {
+    auto* service = BraveWalletServiceFactory::GetInstance()->GetForContext(
+        ctx->browser_context);
+    if (!service) {
+      return net::OK;
+    }
+
+    service->rpc_controller()->EnsProxyReaderResolveAddress(
+        kEnsRegistryContractAddress, ctx->request_url.host(),
+        std::vector<std::string>(std::begin(kRecordKeys),
+                                 std::end(kRecordKeys)),
+        base::BindOnce(&OnBeforeURLRequest_EnsRedirectWork,
+                       next_callback, ctx));
+
+    return net::ERR_IO_PENDING;
+  }
+
   return net::OK;
+}
+
+
+void OnBeforeURLRequest_EnsRedirectWork(
+    const brave::ResponseCallback& next_callback,
+    std::shared_ptr<brave::BraveRequestInfo> ctx,
+    bool success,
+    const std::string& ipfs_uri) {
+  if (!success) {
+    if (!next_callback.is_null())
+      next_callback.Run();
+    return;
+  }
+
+  if (!ipfs_uri.empty()) {
+    ctx->new_url_spec = GURL("ipfs://" + ipfs_uri).spec();
+  }
+
+  if (!next_callback.is_null())
+    next_callback.Run();
 }
 
 void OnBeforeURLRequest_DecentralizedDnsRedirectWork(

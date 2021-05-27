@@ -16,6 +16,7 @@
 #include "brave/components/ipfs/ipfs_ports.h"
 #include "brave/components/ipfs/keys/ipns_keys_manager.h"
 #include "brave/components/ipfs/pref_names.h"
+#include "components/base32/base32.h"
 #include "components/prefs/pref_service.h"
 #include "components/user_prefs/user_prefs.h"
 #include "content/public/browser/browser_context.h"
@@ -25,6 +26,37 @@
 #include "url/gurl.h"
 
 namespace {
+
+// Ipfs codes from multicodec table
+// https://github.com/multiformats/multicodec/blob/master/table.csv
+const std::string GetIpfsCodecName(int64_t code) {
+  switch(code) {
+    case 0xE3:
+      return "ipfs-ns";
+    case 0xE5:
+      return "ipns-ns";
+  }
+  return std::string();
+}
+
+bool DecodeVarInt(base::StringPiece* from, int64_t* into) {
+  base::StringPiece::const_iterator it = from->begin();
+  int shift = 0;
+  uint64_t ret = 0;
+  do {
+    if (it == from->end())
+      return false;
+
+    // Shifting 64 or more bits is undefined behavior.
+    DCHECK_LT(shift, 64);
+    unsigned char c = *it;
+    ret |= static_cast<uint64_t>(c & 0x7f) << shift;
+    shift += 7;
+  } while (*it++ & 0x80);
+  *into = static_cast<int64_t>(ret);
+  from->remove_prefix(it - from->begin());
+  return true;
+}
 
 GURL AppendLocalPort(const std::string& port) {
   GURL gateway = GURL(ipfs::kDefaultIPFSLocalGateway);
@@ -340,6 +372,30 @@ bool ParsePeerConnectionString(const std::string& value,
 
 bool IsValidNodeFilename(const std::string& filename) {
   return RE2::FullMatch(filename, kExecutableRegEx);
+}
+
+std::string ContentHashToIpfs(const std::string& contenthash) {
+  int64_t code = 0;
+  base::StringPiece input = contenthash;
+  DLOG(INFO) << "contenthash:" << contenthash;
+  if (!DecodeVarInt(&input, &code))
+    return std::string();
+  std::string codecname = GetIpfsCodecName(code);
+  if (codecname.empty())
+    return std::string();
+  if (codecname == "ipfs-ns") {
+    DLOG(INFO) << "codec:" << code << " name:" << codecname;
+    DLOG(INFO) << "value:" << input;
+    std::string encoded = base32::Base32Encode(input);
+    if (encoded.empty())
+      return std::string();
+    std::string trimmed;
+    base::TrimString(encoded, "=", &trimmed);
+    std::string lowercase = base::ToLowerASCII(trimmed);
+    std::string cidv1 = "b" + lowercase;
+    return cidv1;
+  }
+  return std::string();
 }
 
 }  // namespace ipfs

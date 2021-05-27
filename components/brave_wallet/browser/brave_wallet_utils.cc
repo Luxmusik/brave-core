@@ -92,7 +92,7 @@ bool PadHexEncodedParameter(const std::string& hex_input, std::string* out) {
   *out = base::StringPrintf("0x%s%s", padding.c_str(), hex_substr.c_str());
   return true;
 }
-
+  
 // Determines if the passed in hex string is valid
 bool IsValidHexString(const std::string& hex_input) {
   if (hex_input.length() < 3) {
