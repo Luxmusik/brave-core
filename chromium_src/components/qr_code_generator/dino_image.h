@@ -9,8 +9,13 @@
 // Contains constants clients use to to render a lion on top of a QR image.
 namespace dino_image {
 
+// (*) For whatever reason height of 25 + makes the image not render right. So
+// we'lljust cut off 1 row from the top and the bottom and shift the image all
+// the way to the left to keep the width < heght proportion exptected in
+// QRCodeGeneratorServiceImpl::InitializeDinoBitmap's DCHECK.
+
 // Width of the lion pixel data.
-static constexpr int kDinoWidth = 24;
+static constexpr int kDinoWidth = 22;
 // Height of the lion pixel data.
 static constexpr int kDinoHeight = 24;
 // Height of the lion pixel data, top segment.
@@ -20,46 +25,49 @@ static constexpr int kDinoBodyHeight = kDinoHeight - kDinoHeadHeight;
 // Width of the lion image data.
 static constexpr int kDinoWidthBytes = (kDinoWidth + 7) / 8;
 
-// Pixel data for the lion's head (dino facing right - inapplicable to the lion)
+// Pixel data for the lion's head (original lion)
 static const unsigned char kDinoHeadRight[kDinoWidthBytes * kDinoHeadHeight] = {
     // clang-format off
-  0b00000000, 0b11111111, 0b00000000,
+  // 0b00000001, 0b11111110, 0b00000000, See (*) comment above
+  0b00000011, 0b11111111, 0b00000000,
     // clang-format on
 };
 
-// Pixel data for the lion's head (dino facing left - inapplicable to the lion)
+// Pixel data for the lion's head (original lion, maybe add sunglasses later?)
 static const unsigned char kDinoHeadLeft[kDinoWidthBytes * kDinoHeadHeight] = {
     // clang-format off
-  0b00000000, 0b11111111, 0b00000000,
+  // 0b00000001, 0b11111110, 0b00000000, See (*) comment above
+  0b00000011, 0b11111111, 0b00000000,
     // clang-format on
 };
 
 // Pixel data for the lion's body.
 static const unsigned char kDinoBody[kDinoWidthBytes * kDinoBodyHeight] = {
     // clang-format off
-  0b00000001, 0b11111111, 0b10000000,
-  0b00001111, 0b11111111, 0b11110000,
-  0b00011111, 0b11111111, 0b11111000,
-  0b00011110, 0b00000000, 0b01111000,
-  0b00001100, 0b00000000, 0b00110000,
-  0b00011000, 0b11100111, 0b00011000,
-  0b00011000, 0b00100100, 0b00011000,
-  0b00011000, 0b00100100, 0b00011000,
-  0b00011100, 0b00100100, 0b00111000,
-  0b00001110, 0b01000010, 0b01110000,
-  0b00001111, 0b00111100, 0b11110000,
-  0b00001111, 0b00011000, 0b11110000,
-  0b00001111, 0b00011000, 0b11110000,
-  0b00000111, 0b01100110, 0b11100000,
-  0b00000111, 0b11000011, 0b11100000,
-  0b00000111, 0b10000001, 0b11100000,
-  0b00000011, 0b11100111, 0b11000000,
-  0b00000011, 0b11111111, 0b11000000,
-  0b00000001, 0b11111111, 0b10000000,
-  0b00000000, 0b11111111, 0b00000000,
-  0b00000000, 0b01111110, 0b00000000,
-  0b00000000, 0b00011000, 0b00000000,
-  0b00000000, 0b00000000, 0b00000000,
+  0b00000111, 0b11111111, 0b10000000,
+  0b00111111, 0b11111111, 0b11110000,
+  0b01111001, 0b10000110, 0b01111000,
+  0b01111000, 0b00000000, 0b01111000,
+  0b01110000, 0b00000000, 0b00111000,
+  0b01100011, 0b11001111, 0b00011000,
+  0b11100000, 0b01001000, 0b00011100,
+  0b01100000, 0b01001000, 0b00011000,
+  0b01110000, 0b00000000, 0b00111000,
+  0b01111000, 0b10000100, 0b01111000,
+  0b01111100, 0b01111000, 0b11111000,
+  0b00111100, 0b00110000, 0b11110000,
+  0b00111000, 0b00000000, 0b01110000,
+  0b00111100, 0b00110000, 0b11110000,
+  0b00111110, 0b11001101, 0b11110000,
+  0b00011111, 0b00000011, 0b11100000,
+  0b00011111, 0b00000011, 0b11100000,
+  0b00011111, 0b10000111, 0b11100000,
+  0b00001111, 0b11111111, 0b11000000,
+  0b00001111, 0b11111111, 0b11000000,
+  0b00000011, 0b11111111, 0b00000000,
+  0b00000001, 0b11111110, 0b00000000,
+  0b00000000, 0b01111000, 0b00000000,
+  // 0b00000000, 0b00110000, 0b00000000, See (*) comment above
     // clang-format on
 };
 
