@@ -113,7 +113,7 @@ bool CookieSettingsBase::ShouldUseEphemeralStorage(
 
   if (base::FeatureList::IsEnabled(
           net::features::kBraveFirstPartyEphemeralStorage) &&
-      IsCookieSessionOnly(first_party_url)) {
+      (IsCookieSessionOnly(first_party_url) || IsCookieSessionOnly(url))) {
     return true;
   }
 
